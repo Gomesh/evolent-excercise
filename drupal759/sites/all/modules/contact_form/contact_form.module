@@ -1,0 +1,130 @@
+<?php
+/**
+ * Implements hook_menu().
+ *
+ * Sets up calls to drupal_get_form() for all our example cases.
+ *
+ * @see menu_example.module
+ * @see menu_example_menu()
+ */
+function contact_form_menu() {
+  $items = array();
+  $items['contact'] = array(
+    'title' => 'Contact form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('contact_detail_form'),
+    'access arguments' => array('access content'),
+    'description' => t('My form'),
+    'type' => MENU_CALLBACK,
+  );
+  // Show a menu link in a menu other than the default "Navigation" menu.
+  // The menu must already exist.
+  $items['contact'] = array(
+    'title' => 'Contact Form',
+    // Machine name of the menu in which the link should appear.
+    'menu_name' => 'main-menu',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('contact_detail_form'),
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+  /**
+   * Implement hook_form.
+   *
+   */
+  function contact_detail_form($form, &$form_state) {
+    // Since the form builder is called after every AJAX request, we rebuild
+    // the form based on $form_state.
+
+    $form['firstname'] = array(
+      '#type' => 'textfield',
+      '#title' => t('First Name'),
+      '#description' => t('First name must be at least 5 characters in length.'),
+      '#required' => TRUE,
+    );
+
+    $form['lastname'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Last Name'),
+        '#description' => t('Last name must be at least 5 characters in length.'),
+        '#required' => TRUE,
+    );
+    
+    $form['email'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Email'),
+        '#description' => t('Please enter valid mail ID.'),
+        '#required' => TRUE,
+    );
+
+    $form['email'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Email'),
+        '#description' => t('Please enter valid mail ID.'),
+        '#required' => TRUE,
+    );
+
+    $form['phone'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Phone'),
+        '#description' => t('Please enter valid Phone No.'),
+        '#required' => TRUE,
+    );
+    
+    $form['radiobutton'] = [
+        '#type' => 'radios',
+        '#title' => t('Status'),
+        '#default_value' => 0,
+        '#options' => array(0 => t('Inactive'), 1 => t('Active')),
+        '#description' => t('Must select one of these.'),
+        '#required' => TRUE,
+    ];
+
+    // Add a submit button that handles the submission of the form.
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    return $form;
+  }
+
+
+/**
+ * Validates the form.
+ */
+function contact_detail_form_validate($form, &$form_state) {
+  $email = $form_state['values']['email'];
+  if (!valid_email_address($email)) {
+    form_set_error('submitted][email_address', t('The email address appears to be invalid.'));
+  }
+}
+
+/**
+ * Add a submit handler/function to the form.
+ *
+ * This will add a completion message to the screen when the
+ * form successfully processes
+ */
+function contact_detail_form_submit($form, &$form_state) {
+  $firstname = $form_state['values']['firstname'];
+  $lastname  = $form_state['values']['lastname'];
+  $email     = $form_state['values']['email'];
+  $radio = $form_state['values']['radiobutton']; 
+  $phone = $form_state['values']['phone'];
+
+  $field = array(
+    'firstname' =>  $firstname,
+    'lastname' =>  $lastname,
+    'email' => $email,
+    'radiobutton' => $radio,
+    'phone' => $phone,
+    );
+  db_insert('contact_form')
+          ->fields($field)
+          ->execute();
+  drupal_set_message("Contact form Sucessfully saved. Thanks for visiting the site.");
+}

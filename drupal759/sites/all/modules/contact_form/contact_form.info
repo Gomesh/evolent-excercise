@@ -1,0 +1,11 @@
+name = Contact Form
+description = Module showing how to use Contact forms
+package = Contact Form
+core = 7.x
+configure = contact
+
+; Information added by Drupal.org packaging script on 2018-05-21
+version = "7.x-1.14"
+core = "7.x"
+project = "Contact"
+datestamp = "1474218553"
